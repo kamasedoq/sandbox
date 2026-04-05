@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>経過時間</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="label">
+      Il Dottore SINCE
+      <span class="help" id="help">?<span class="tooltip" id="tooltip"><span class="tooltip-desc">Calculated from the end of<br>Genshin Impact maintenance</span><span class="tooltip-time" id="tooltip-time"></span></span></span>
+    </div>
+    <div class="start-date">2026.01.14 — 11:13 JST</div>
+
+    <div class="elapsed">
+      <div class="unit">
+        <span class="value" id="days">0</span>
+        <span class="name">days</span>
+      </div>
+      <span class="separator">:</span>
+      <div class="unit">
+        <span class="value" id="hours">00</span>
+        <span class="name">hours</span>
+      </div>
+      <span class="separator">:</span>
+      <div class="unit">
+        <span class="value" id="minutes">00</span>
+        <span class="name">min</span>
+      </div>
+      <span class="separator">:</span>
+      <div class="unit">
+        <span class="value" id="seconds">00</span>
+        <span class="name">sec</span>
+      </div>
+    </div>
+
+    <div class="total-seconds" id="total"></div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
