@@ -1,5 +1,13 @@
 const START = new Date('2026-01-14T11:13:00+09:00').getTime();
 
+const bgEl = document.getElementById('bg');
+const bgImg = new Image();
+bgImg.src = 'bg.gif';
+bgImg.onload = function() {
+  bgEl.style.backgroundImage = 'url(' + bgImg.src + ')';
+  bgEl.setAttribute('data-loaded', 'true');
+};
+
 function pad(n) {
   return String(n).padStart(2, '0');
 }
