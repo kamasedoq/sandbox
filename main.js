@@ -48,3 +48,11 @@ document.addEventListener('click', function() {
 function tick() { update(); updateTooltip(); }
 tick();
 setInterval(tick, 1000);
+
+const bg = new Image();
+bg.onload = function() {
+  setTimeout(function() {
+    document.body.classList.add('bg-loaded');
+  }, 500);
+};
+bg.src = 'bg.gif';
