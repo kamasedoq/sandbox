@@ -6,9 +6,26 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #0a0a0f url('bg.gif') center / cover no-repeat fixed;
+  padding: 1rem;
+  background: #0a0a0f;
   color: #e0e0e0;
   font-family: 'Helvetica Neue', Arial, sans-serif;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: url('bg.gif') center / cover no-repeat;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+body.bg-loaded::before {
+  opacity: 1;
 }
 
 .container {
@@ -17,6 +34,7 @@ body {
   background: rgba(0, 0, 0, 0.5);
   border-radius: 1rem;
   backdrop-filter: blur(4px);
+  max-width: 100%;
 }
 
 .label {
@@ -143,7 +161,30 @@ body {
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: 1.5rem 1rem;
+    border-radius: 0.75rem;
+  }
+  .label { font-size: 0.8rem; }
+  .start-date {
+    font-size: 0.95rem;
+    margin-bottom: 1.75rem;
+  }
+  .elapsed {
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+  .unit { min-width: 52px; }
   .unit .value { font-size: 2rem; }
+  .unit .name {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+  }
   .separator { font-size: 2rem; }
-  .elapsed { gap: 0.8rem; }
+  .total-seconds { font-size: 0.75rem; }
+  .tooltip {
+    white-space: normal;
+    max-width: 80vw;
+    width: max-content;
+  }
 }
