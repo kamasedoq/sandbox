@@ -308,7 +308,9 @@ body.bg-loaded .bg { opacity: 1; }
   letter-spacing: 0.04em;
 }
 
-/* D : H : M : S row */
+/* D : H : M : S row
+   Scale presets live as CSS custom properties on the row itself,
+   matching the handoff README's `primary-lg` / `primary` / `secondary-lg` / `secondary` table. */
 .row {
   display: flex;
   align-items: flex-start;
@@ -316,25 +318,16 @@ body.bg-loaded .bg { opacity: 1; }
   justify-content: center;
 }
 
-.row-primary {
-  margin-top: 28px;
-  gap: 10px;
-}
-
-.row-secondary {
-  margin-top: 12px;
-  gap: 6px;
-}
+.row-primary  { --num: 56px; --sep: 36px; --label: 10px; --cell-ratio: 0.7; margin-top: 28px; gap: 10px; }
+.row-secondary { --num: 28px; --sep: 16px; --label: 8px;  --cell-ratio: 0.7; margin-top: 12px; gap: 6px; }
 
 .cell {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
+  min-width: calc(var(--num) * var(--cell-ratio));
 }
-
-.row-primary .cell { min-width: calc(56px * 0.7); }
-.row-secondary .cell { min-width: calc(28px * 0.7); }
 
 .num {
   font-family: var(--font-numeral);
@@ -343,10 +336,8 @@ body.bg-loaded .bg { opacity: 1; }
   line-height: 0.9;
   letter-spacing: -0.02em;
   font-variant-numeric: lining-nums tabular-nums;
+  font-size: var(--num);
 }
-
-.row-primary .num { font-size: 56px; }
-.row-secondary .num { font-size: 28px; }
 
 .cell-label {
   font-family: var(--font-sans);
@@ -355,20 +346,16 @@ body.bg-loaded .bg { opacity: 1; }
   text-transform: uppercase;
   letter-spacing: 0.18em;
   margin-top: 4px;
+  font-size: var(--label);
 }
-
-.row-primary .cell-label { font-size: 10px; }
-.row-secondary .cell-label { font-size: 8px; }
 
 .sep {
   font-family: var(--font-numeral);
   font-weight: 400;
   color: var(--vc-faint);
   line-height: 0.95;
+  font-size: var(--sep);
 }
-
-.row-primary .sep { font-size: 36px; }
-.row-secondary .sep { font-size: 16px; }
 
 /* Divider */
 .divider {
@@ -477,15 +464,7 @@ body.bg-loaded .bg { opacity: 1; }
     font-size: 10.2px;
   }
 
-  .row-primary {
-    margin-top: 40px;
-    gap: 18px;
-    justify-content: flex-start;
-  }
-  .row-primary .num { font-size: 84px; }
-  .row-primary .sep { font-size: 56px; }
-  .row-primary .cell-label { font-size: 13px; }
-  .row-primary .cell { min-width: calc(84px * 0.85); }
+  .row-primary  { --num: 84px; --sep: 56px; --label: 13px; --cell-ratio: 0.85; margin-top: 40px; gap: 18px; justify-content: flex-start; }
 
   .divider {
     width: 100%;
@@ -517,14 +496,7 @@ body.bg-loaded .bg { opacity: 1; }
 
   .date-mobile { display: none; }
 
-  .row-secondary {
-    margin-top: 0;
-    gap: 8px;
-  }
-  .row-secondary .num { font-size: 36px; }
-  .row-secondary .sep { font-size: 22px; }
-  .row-secondary .cell-label { font-size: 9px; }
-  .row-secondary .cell { min-width: calc(36px * 0.85); }
+  .row-secondary { --num: 36px; --sep: 22px; --label: 9px; --cell-ratio: 0.85; margin-top: 0; gap: 8px; }
 
   .pill-secondary { font-size: 10px; padding: 6px 14px; }
 }
