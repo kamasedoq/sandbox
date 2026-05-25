@@ -182,6 +182,33 @@ body.bg-loaded .bg { opacity: 1; }
   margin-top: 6px;
 }
 
+.epithet {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--vc-dim);
+  line-height: 1.1;
+}
+
+.epithet-primary {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.epithet-secondary {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+@media (min-width: 768px) {
+  .epithet-primary {
+    font-size: 14px;
+  }
+  .epithet-secondary {
+    font-size: 13px;
+  }
+}
+
 /* Pill */
 .pill-wrap { margin-top: 16px; }
 .pill-wrap-secondary { margin-top: 4px; display: none; }
