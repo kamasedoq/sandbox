@@ -1,58 +1,75 @@
-const START = new Date('2026-01-14T11:13:00+09:00').getTime();
+const UNITS = [
+  { label: 'days', pad: false },
+  { label: 'hour', pad: true },
+  { label: 'min',  pad: true },
+  { label: 'sec',  pad: true },
+];
 
-function pad(n) {
-  return String(n).padStart(2, '0');
+const pad2 = (n) => String(n).padStart(2, '0');
+
+function buildRow(rowEl) {
+  const nums = [];
+  UNITS.forEach((u, i) => {
+    if (i > 0) {
+      const sep = document.createElement('span');
+      sep.className = 'sep';
+      sep.textContent = ':';
+      rowEl.appendChild(sep);
+    }
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.innerHTML = `<span class="num">${u.pad ? '00' : '0'}</span><span class="cell-label">${u.label}</span>`;
+    rowEl.appendChild(cell);
+    nums.push(cell.querySelector('.num'));
+  });
+  return nums;
 }
 
-function update() {
-  const diff = Date.now() - START;
-  if (diff < 0) return;
+const blocks = [...document.querySelectorAll('[data-elapsed]')].map((block) => ({
+  target: new Date(block.dataset.target).getTime(),
+  nums: buildRow(block.querySelector('.row')),
+}));
 
-  const totalSec = Math.floor(diff / 1000);
-  const days = Math.floor(totalSec / 86400);
-  const hours = Math.floor((totalSec % 86400) / 3600);
-  const minutes = Math.floor((totalSec % 3600) / 60);
-  const seconds = totalSec % 60;
-
-  document.getElementById('days').textContent = days;
-  document.getElementById('hours').textContent = pad(hours);
-  document.getElementById('minutes').textContent = pad(minutes);
-  document.getElementById('seconds').textContent = pad(seconds);
-  document.getElementById('total').textContent = totalSec.toLocaleString() + ' seconds';
+function tick() {
+  const now = Date.now();
+  blocks.forEach(({ target, nums }) => {
+    const totalSec = Math.max(0, Math.floor((now - target) / 1000));
+    const days    = Math.floor(totalSec / 86400);
+    const hours   = Math.floor((totalSec % 86400) / 3600);
+    const minutes = Math.floor((totalSec % 3600) / 60);
+    const seconds = totalSec % 60;
+    nums[0].textContent = days;
+    nums[1].textContent = pad2(hours);
+    nums[2].textContent = pad2(minutes);
+    nums[3].textContent = pad2(seconds);
+  });
 }
 
-function updateTooltip() {
-  const now = new Date();
-  const jst = new Date(now.getTime() + (now.getTimezoneOffset() + 540) * 60000);
-  const y = jst.getFullYear();
-  const mo = pad(jst.getMonth() + 1);
-  const d = pad(jst.getDate());
-  const h = pad(jst.getHours());
-  const mi = pad(jst.getMinutes());
-  const s = pad(jst.getSeconds());
-  document.getElementById('tooltip-time').textContent =
-    'As of ' + y + '/' + mo + '/' + d + ' ' + h + ':' + mi + ':' + s + ' JST';
-}
-
-const helpEl = document.getElementById('help');
-helpEl.addEventListener('click', function(e) {
-  e.stopPropagation();
-  const active = helpEl.getAttribute('data-active') === 'true';
-  helpEl.setAttribute('data-active', !active);
-  if (!active) updateTooltip();
-});
-document.addEventListener('click', function() {
-  helpEl.setAttribute('data-active', 'false');
-});
-
-function tick() { update(); updateTooltip(); }
 tick();
 setInterval(tick, 1000);
 
+// Tooltip wiring for ? buttons
+document.querySelectorAll('.help').forEach((btn) => {
+  const tooltip = btn.parentElement.querySelector('.tooltip');
+  if (!tooltip) return;
+  const open  = () => { tooltip.hidden = false; btn.setAttribute('aria-expanded', 'true');  };
+  const close = () => { tooltip.hidden = true;  btn.setAttribute('aria-expanded', 'false'); };
+  btn.addEventListener('mouseenter', open);
+  btn.addEventListener('mouseleave', close);
+  btn.addEventListener('focus', open);
+  btn.addEventListener('blur', close);
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    tooltip.hidden ? open() : close();
+  });
+  document.addEventListener('click', (e) => {
+    if (!btn.parentElement.contains(e.target)) close();
+  });
+});
+
+// Preload background then fade in
 const bg = new Image();
-bg.onload = function() {
-  setTimeout(function() {
-    document.body.classList.add('bg-loaded');
-  }, 500);
+bg.onload = () => {
+  setTimeout(() => document.body.classList.add('bg-loaded'), 500);
 };
 bg.src = 'bg.gif';
