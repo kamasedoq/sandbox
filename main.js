@@ -49,7 +49,7 @@ tick();
 setInterval(tick, 1000);
 
 // Tooltip wiring for ? buttons
-document.querySelectorAll('.help').forEach((btn) => {
+document.querySelectorAll('.help, .brand-trigger').forEach((btn) => {
   const tooltip = btn.parentElement.querySelector('.tooltip');
   if (!tooltip) return;
   const open  = () => { tooltip.hidden = false; btn.setAttribute('aria-expanded', 'true');  };
