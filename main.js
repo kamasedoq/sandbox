@@ -1,58 +1,62 @@
-const START = new Date('2026-01-14T11:13:00+09:00').getTime();
+const pad2 = (n) => String(n).padStart(2, '0');
 
-function pad(n) {
-  return String(n).padStart(2, '0');
-}
-
-function update() {
-  const diff = Date.now() - START;
-  if (diff < 0) return;
-
+function computeElapsed(targetISO, now) {
+  const target = new Date(targetISO).getTime();
+  const diff = Math.max(0, now - target);
   const totalSec = Math.floor(diff / 1000);
-  const days = Math.floor(totalSec / 86400);
-  const hours = Math.floor((totalSec % 86400) / 3600);
-  const minutes = Math.floor((totalSec % 3600) / 60);
-  const seconds = totalSec % 60;
-
-  document.getElementById('days').textContent = days;
-  document.getElementById('hours').textContent = pad(hours);
-  document.getElementById('minutes').textContent = pad(minutes);
-  document.getElementById('seconds').textContent = pad(seconds);
-  document.getElementById('total').textContent = totalSec.toLocaleString() + ' seconds';
+  return {
+    days: Math.floor(totalSec / 86400),
+    hours: Math.floor((totalSec % 86400) / 3600),
+    minutes: Math.floor((totalSec % 3600) / 60),
+    seconds: totalSec % 60,
+  };
 }
 
-function updateTooltip() {
-  const now = new Date();
-  const jst = new Date(now.getTime() + (now.getTimezoneOffset() + 540) * 60000);
-  const y = jst.getFullYear();
-  const mo = pad(jst.getMonth() + 1);
-  const d = pad(jst.getDate());
-  const h = pad(jst.getHours());
-  const mi = pad(jst.getMinutes());
-  const s = pad(jst.getSeconds());
-  document.getElementById('tooltip-time').textContent =
-    'As of ' + y + '/' + mo + '/' + d + ' ' + h + ':' + mi + ':' + s + ' JST';
+const blocks = document.querySelectorAll('[data-elapsed]');
+
+function tick() {
+  const now = Date.now();
+  blocks.forEach((block) => {
+    const iso = block.getAttribute('data-target');
+    const { days, hours, minutes, seconds } = computeElapsed(iso, now);
+    block.querySelector('[data-elapsed-days]').textContent = days;
+    block.querySelector('[data-elapsed-hours]').textContent = pad2(hours);
+    block.querySelector('[data-elapsed-minutes]').textContent = pad2(minutes);
+    block.querySelector('[data-elapsed-seconds]').textContent = pad2(seconds);
+  });
 }
 
-const helpEl = document.getElementById('help');
-helpEl.addEventListener('click', function(e) {
-  e.stopPropagation();
-  const active = helpEl.getAttribute('data-active') === 'true';
-  helpEl.setAttribute('data-active', !active);
-  if (!active) updateTooltip();
-});
-document.addEventListener('click', function() {
-  helpEl.setAttribute('data-active', 'false');
-});
-
-function tick() { update(); updateTooltip(); }
 tick();
 setInterval(tick, 1000);
 
+// Tooltip wiring for ? buttons
+document.querySelectorAll('.help').forEach((btn) => {
+  const tooltip = btn.parentElement.querySelector('.tooltip');
+  if (!tooltip) return;
+  const open = () => {
+    tooltip.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+  };
+  const close = () => {
+    tooltip.hidden = true;
+    btn.setAttribute('aria-expanded', 'false');
+  };
+  btn.addEventListener('mouseenter', open);
+  btn.addEventListener('mouseleave', close);
+  btn.addEventListener('focus', open);
+  btn.addEventListener('blur', close);
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    tooltip.hidden ? open() : close();
+  });
+  document.addEventListener('click', (e) => {
+    if (!btn.parentElement.contains(e.target)) close();
+  });
+});
+
+// Preload background then fade in
 const bg = new Image();
-bg.onload = function() {
-  setTimeout(function() {
-    document.body.classList.add('bg-loaded');
-  }, 500);
+bg.onload = () => {
+  setTimeout(() => document.body.classList.add('bg-loaded'), 500);
 };
 bg.src = 'bg.gif';
