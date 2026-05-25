@@ -1,2 +1,6 @@
 .claude/
 .playwright-mcp/
+
+# Local layout snapshots (root-level viewport screenshots)
+/desktop-*.png
+/mobile-*.png
