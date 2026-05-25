@@ -170,6 +170,49 @@ body.bg-loaded .bg { opacity: 1; }
   font-style: normal;
 }
 
+.name a {
+  color: var(--vc-warm);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.1em;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.12em;
+  text-decoration-thickness: 1px;
+}
+
+.name a:hover,
+.name a:focus-visible {
+  color: var(--vc-silver);
+  text-decoration-color: var(--vc-silver);
+}
+
+.ext-icon {
+  width: 0.42em;
+  height: 0.42em;
+  flex-shrink: 0;
+  color: var(--vc-dim);
+  align-self: flex-start;
+  margin-top: 0.18em;
+  transition: color 0.2s ease;
+  opacity: 0.85;
+}
+
+.name-primary .ext-icon {
+  stroke-width: 0.9;
+  width: 0.34em;
+  height: 0.34em;
+  margin-top: 0.24em;
+}
+
+.name a:hover .ext-icon,
+.name a:focus-visible .ext-icon {
+  color: var(--vc-silver);
+  opacity: 1;
+}
+
 .name-primary {
   font-size: 38px;
   letter-spacing: -0.01em;
