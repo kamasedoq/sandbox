@@ -159,7 +159,7 @@ body.bg-loaded .bg { opacity: 1; }
 }
 
 .eyebrow-primary { font-size: 11px; }
-.eyebrow-secondary { font-size: 10px; }
+.eyebrow-secondary { font-size: 9px; }
 
 /* Subject names */
 .name {
@@ -475,7 +475,7 @@ body.bg-loaded .bg { opacity: 1; }
   }
 
   .eyebrow-primary { font-size: 13px; }
-  .eyebrow-secondary { font-size: 11px; }
+  .eyebrow-secondary { font-size: 10px; }
 
   .name-primary {
     font-size: 64px;
