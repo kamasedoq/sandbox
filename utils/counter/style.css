@@ -5,9 +5,15 @@
   --ink-faint: #aaaaaa;
   --rule: rgba(0, 0, 0, 0.08);
   --tap: rgba(0, 0, 0, 0.04);
+  --focus: rgba(0, 0, 0, 0.42);
 
   --font-display: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --bump-duration: 180ms;
+  --float-duration: 700ms;
+  --pulse-duration: 1.2s;
+  --lap-in-duration: 320ms;
 }
 
 * { box-sizing: border-box; }
@@ -28,6 +34,7 @@ body {
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* Tap zones */
@@ -53,6 +60,12 @@ body {
 
 .half:active { background: var(--tap); }
 .half + .half { border-left: 1px solid var(--rule); }
+.half:focus { outline: none; }
+.half:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -8px;
+  border-radius: 4px;
+}
 
 .sign {
   position: absolute;
@@ -69,7 +82,8 @@ body {
 
 .half.left .sign { left: 28px; }
 .half.right .sign { right: 28px; }
-.half:hover .sign { opacity: 1; color: var(--ink-soft); }
+.half:hover .sign,
+.half:focus-visible .sign { opacity: 1; color: var(--ink-soft); }
 
 /* Center overlay: sits above tap zones but does not block clicks */
 .center {
@@ -102,7 +116,7 @@ body {
   letter-spacing: -0.05em;
   color: var(--ink);
   text-align: center;
-  transition: transform 180ms cubic-bezier(0.2, 0.7, 0.3, 1.4);
+  transition: transform var(--bump-duration) cubic-bezier(0.2, 0.7, 0.3, 1.4);
   will-change: transform;
   padding-bottom: 0.04em;
   position: relative;
@@ -130,7 +144,7 @@ body {
   height: 6px;
   border-radius: 50%;
   background: var(--ink-soft);
-  animation: pulse 1.2s ease-in-out infinite;
+  animation: pulse var(--pulse-duration) ease-in-out infinite;
 }
 
 .timer.idle .pulse { background: var(--ink-faint); animation: none; }
@@ -150,7 +164,7 @@ body {
   pointer-events: none;
   color: var(--ink-soft);
   top: 12%;
-  animation: floatUp 700ms cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
+  animation: floatUp var(--float-duration) cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
 }
 
 .float.left { left: -0.4em; }
@@ -186,11 +200,13 @@ body {
 .laps-count:not(:empty)::before { content: " · "; }
 
 .laps-scroll {
+  list-style: none;
+  margin: 0;
+  padding: 8px 2px 4px;
   display: flex;
   gap: 18px;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 8px 2px 4px;
   scroll-snap-type: x mandatory;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -207,7 +223,7 @@ body {
   padding: 6px 10px 6px 0;
   border-right: 1px solid var(--rule);
   scroll-snap-align: start;
-  animation: lapIn 320ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation: lapIn var(--lap-in-duration) cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 
 .lap:last-child { border-right: none; }
@@ -235,6 +251,7 @@ body {
 }
 
 .laps-empty {
+  margin: 0;
   color: var(--ink-faint);
   font-size: 11px;
   text-align: center;
@@ -247,4 +264,12 @@ body {
   .half.left .sign { left: 18px; }
   .half.right .sign { right: 18px; }
   .laps { padding: 16px 18px 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

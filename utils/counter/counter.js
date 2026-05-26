@@ -12,21 +12,25 @@
   const lapsScrollEl = document.getElementById("laps-scroll");
 
   let count = 0;
-  let laps = []; // newest first; each = { count, delta, t }
+  /** Newest first. Each entry: { count, delta, t }. */
+  let laps = [];
   let lastTs = null;
   let timerRaf = null;
 
+  function padFloor(n, len) {
+    return String(Math.floor(n)).padStart(len, "0");
+  }
+
   function formatDelta(ms) {
     if (ms == null) return "—";
-    if (ms < 1000) return `0.${String(Math.floor(ms / 10)).padStart(2, "0")}s`;
+    if (ms < 1000) return `0.${padFloor(ms / 10, 2)}s`;
     const totalSec = ms / 1000;
     if (totalSec < 60) return `${totalSec.toFixed(2)}s`;
     const m = Math.floor(totalSec / 60);
     const s = totalSec - m * 60;
     if (m < 60) return `${m}:${s.toFixed(1).padStart(4, "0")}`;
     const h = Math.floor(m / 60);
-    const mm = m - h * 60;
-    return `${h}:${String(mm).padStart(2, "0")}:${String(Math.floor(s)).padStart(2, "0")}`;
+    return `${h}:${padFloor(m - h * 60, 2)}:${padFloor(s, 2)}`;
   }
 
   function formatTimer(ms) {
@@ -37,12 +41,11 @@
     const s = totalSec - m * 60;
     if (m < 60) return `${m}:${s.toFixed(2).padStart(5, "0")}`;
     const h = Math.floor(m / 60);
-    const mm = m - h * 60;
-    return `${h}:${String(mm).padStart(2, "0")}:${s.toFixed(0).padStart(2, "0")}`;
+    return `${h}:${padFloor(m - h * 60, 2)}:${padFloor(s, 2)}`;
   }
 
   function renderCount() {
-    countNumEl.textContent = count < 0 ? `${MINUS}${Math.abs(count)}` : `${count}`;
+    countNumEl.textContent = String(count);
   }
 
   function bump(direction) {
@@ -57,7 +60,7 @@
     el.textContent = value;
     countEl.appendChild(el);
     el.addEventListener("animationend", () => el.remove(), { once: true });
-    // Safety net in case animationend never fires (e.g. tab backgrounded)
+    // animationend は背景タブ等で発火しないことがあるための保険
     setTimeout(() => el.isConnected && el.remove(), FLOAT_DURATION + 200);
   }
 
@@ -78,7 +81,7 @@
     }
   }
 
-  function updateTimerDisplay() {
+  function refreshTimer() {
     if (lastTs == null) {
       timerEl.classList.add("idle");
       timerValueEl.textContent = "00.00s";
@@ -90,58 +93,58 @@
     }
   }
 
-  function renderLaps() {
-    if (laps.length === 0) {
-      lapsCountEl.textContent = "";
-      lapsEmptyEl.hidden = false;
-      lapsScrollEl.hidden = true;
-      lapsScrollEl.replaceChildren();
-      return;
-    }
-    lapsCountEl.textContent = String(laps.length);
-    lapsEmptyEl.hidden = true;
-    lapsScrollEl.hidden = false;
+  function createLapNode(lap) {
+    const li = document.createElement("li");
+    li.className = "lap";
 
-    const frag = document.createDocumentFragment();
-    laps.forEach((lap) => {
-      const wrap = document.createElement("div");
-      wrap.className = "lap";
+    const cnt = document.createElement("span");
+    cnt.className = "lap-count";
+    cnt.textContent = String(lap.count);
 
-      const top = document.createElement("div");
-      top.className = "lap-top";
-      const cnt = document.createElement("span");
-      cnt.className = "lap-count";
-      cnt.textContent = String(lap.count);
-      top.appendChild(cnt);
+    const time = document.createElement("span");
+    time.className = "lap-time";
+    time.textContent = formatDelta(lap.delta);
 
-      const time = document.createElement("div");
-      time.className = "lap-time";
-      time.textContent = formatDelta(lap.delta);
+    li.appendChild(cnt);
+    li.appendChild(time);
+    return li;
+  }
 
-      wrap.appendChild(top);
-      wrap.appendChild(time);
-      frag.appendChild(wrap);
-    });
-    lapsScrollEl.replaceChildren(frag);
+  function setLapsCount() {
+    lapsCountEl.textContent = laps.length === 0 ? "" : String(laps.length);
+    const empty = laps.length === 0;
+    lapsEmptyEl.hidden = !empty;
+    lapsScrollEl.hidden = empty;
+  }
+
+  function prependLap(lap) {
+    lapsScrollEl.prepend(createLapNode(lap));
     lapsScrollEl.scrollLeft = 0;
+  }
+
+  function popFirstLap() {
+    lapsScrollEl.firstElementChild?.remove();
   }
 
   function increment() {
     const nowTs = Date.now();
     const delta = lastTs == null ? null : nowTs - lastTs;
-    lastTs = nowTs;
+    const lap = { count: count + 1, delta, t: nowTs };
+
     count += 1;
-    laps = [{ count, delta, t: nowTs }, ...laps];
+    laps = [lap, ...laps];
+    lastTs = nowTs;
 
     renderCount();
     bump(1);
     spawnFloat("+1", "right");
-    updateTimerDisplay();
-    renderLaps();
+    refreshTimer();
+    prependLap(lap);
+    setLapsCount();
   }
 
   function decrement() {
-    // Decrement undoes the most recent increment. No-op when nothing to undo.
+    // 直近の increment を巻き戻す。何もない時は no-op。
     if (laps.length === 0) return;
     laps = laps.slice(1);
     count -= 1;
@@ -150,24 +153,21 @@
     renderCount();
     bump(-1);
     spawnFloat(`${MINUS}1`, "left");
-    updateTimerDisplay();
-    renderLaps();
+    refreshTimer();
+    popFirstLap();
+    setLapsCount();
   }
 
   function tap(dir) {
-    if (dir > 0) increment();
-    else decrement();
+    if (dir === 1) increment();
+    else if (dir === -1) decrement();
   }
 
-  // Tap zones
   document.querySelectorAll(".half").forEach((el) => {
-    el.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      tap(Number(el.dataset.dir));
-    });
+    const dir = el.dataset.dir === "1" ? 1 : -1;
+    el.addEventListener("click", () => tap(dir));
   });
 
-  // Keyboard shortcuts
   window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "+" || e.key === "=") {
       e.preventDefault();
@@ -178,14 +178,12 @@
     }
   });
 
-  // Stop the timer rAF loop when the tab is hidden; resume on visible.
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) stopTimer();
     else if (lastTs != null) startTimer();
   });
 
-  // Initial paint
   renderCount();
-  updateTimerDisplay();
-  renderLaps();
+  refreshTimer();
+  setLapsCount();
 })();

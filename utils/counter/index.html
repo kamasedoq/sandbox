@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
   <title>Counter</title>
   <meta name="description" content="Tap counter with lap intervals">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,7 @@
   <div class="center">
     <div class="count-wrap">
       <div class="count">
-        <span class="count-num" id="count-num">0</span>
+        <span class="count-num" id="count-num" aria-live="polite" aria-atomic="true">0</span>
       </div>
       <div class="timer idle" id="timer">
         <span class="pulse"></span>
@@ -35,8 +35,8 @@
       <div class="laps-head">
         <span><span class="laps-label">Laps</span><span class="laps-count" id="laps-count"></span></span>
       </div>
-      <div class="laps-empty" id="laps-empty">tap either side to begin</div>
-      <div class="laps-scroll" id="laps-scroll" hidden></div>
+      <p class="laps-empty" id="laps-empty">tap either side to begin</p>
+      <ol class="laps-scroll" id="laps-scroll" hidden></ol>
     </div>
   </div>
 
