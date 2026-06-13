@@ -1,0 +1,480 @@
+:root {
+  --bg: #ffffff;
+  --ink: #000000;
+  --ink-soft: #555555;
+  --ink-faint: #aaaaaa;
+  --rule: rgba(0, 0, 0, 0.08);
+  --tap: rgba(0, 0, 0, 0.04);
+  --focus: rgba(0, 0, 0, 0.42);
+  --bg-dim: #e8e8e8;
+
+  --font-display: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --bump-duration: 180ms;
+  --float-duration: 700ms;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.app {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  /* 上(PICKUP)は可変、下(グリッド)はタイル高さに応じた固定 */
+  grid-template-rows: 1fr auto;
+}
+
+/* Clickable counter units */
+.unit {
+  cursor: pointer;
+  transition: background 200ms ease;
+}
+
+.unit:active { background: var(--tap); }
+.unit:focus { outline: none; }
+.unit:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -8px;
+  border-radius: 4px;
+}
+
+/* Pickup (top 60%) */
+.pickup {
+  position: relative;
+  border-bottom: 1px solid var(--rule);
+}
+
+.pickup-body {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 5vmin, 48px);
+  pointer-events: none;
+}
+
+.pickup-icon {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}
+
+/* Reference links (PICKUP エリア左下) */
+.ref-links {
+  position: absolute;
+  left: 12px;
+  bottom: 8px;
+  z-index: 2;
+  display: flex;
+  gap: 14px;
+}
+
+.ref-links a {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--ink-faint);
+  text-decoration: none;
+  padding: 6px 0;
+  transition: color 200ms ease;
+}
+
+.ref-links a:hover { color: var(--ink-soft); }
+
+/* Count number (shared) */
+.count {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  color: var(--ink);
+  text-align: center;
+  transition: transform var(--bump-duration) cubic-bezier(0.2, 0.7, 0.3, 1.4);
+  will-change: transform;
+  position: relative;
+  font-variant-numeric: tabular-nums;
+}
+
+.count.bump-up { transform: scale(1.05); }
+.count.bump-down { transform: scale(0.95); }
+
+.pickup-count { font-size: 144px; }
+
+/* Floating delta */
+.float {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  /* .count の letter-spacing: -0.05em を継承すると +1/−1 が合体して見える */
+  letter-spacing: 0.12em;
+  pointer-events: none;
+  color: var(--ink-soft);
+  top: 0;
+  animation: floatUp var(--float-duration) cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
+}
+
+.float.left { left: -1.2em; }
+.float.right { right: -1.2em; }
+.pickup-count .float { font-size: 22px; }
+.tile-count .float { font-size: 13px; }
+
+@keyframes floatUp {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+/* 左上の丸アイコンボタン共通（?, 鍵, ゴミ箱） */
+.icon-btn {
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink-faint);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.icon-btn:hover { color: var(--ink-soft); border-color: var(--ink-faint); }
+.icon-btn:focus { outline: none; }
+.icon-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Lock (dummy image switch mode) */
+.lock-wrap {
+  position: fixed;
+  top: 12px;
+  left: 48px;
+  z-index: 3;
+}
+
+.lock .shackle-open { display: none; }
+
+body.editing .lock {
+  color: var(--ink);
+  border-color: rgb(199, 179, 142);
+  /* 点滅が無効な環境でも「入」が分かるよう静的にゴールド背景を持たせる */
+  background: rgb(199, 179, 142);
+  animation: lockPulse 1.6s ease-in-out infinite;
+}
+
+/* フェードイン/アウトの点滅 */
+@keyframes lockPulse {
+  0%, 100% { background: rgb(199, 179, 142); }
+  50% { background: rgba(199, 179, 142, 0.1); }
+}
+
+body.editing .lock .shackle { display: none; }
+body.editing .lock .shackle-open { display: inline; }
+
+/* Edit mode: 切り替え可能なスライム画像以外をグレーに */
+body.editing,
+body.editing .tile,
+body.editing .grid::after {
+  /* 非活性が伝わるよう背景もうっすらグレーにする */
+  background: var(--bg-dim);
+}
+
+body.editing .count,
+body.editing .unit:not(.skinnable) img {
+  filter: grayscale(1);
+  opacity: 0.25;
+}
+
+body.editing .unit:not(.skinnable) { cursor: default; }
+body.editing .unit:not(.skinnable):active { background: transparent; }
+
+/* Trash (編集モード中のみ表示・全カウントリセット) */
+.trash {
+  position: fixed;
+  top: 12px;
+  left: 84px;
+  z-index: 3;
+  border-color: rgba(208, 69, 69, 0.35);
+  color: #d04545;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 200ms ease, visibility 200ms ease, border-color 200ms ease;
+}
+
+.trash:hover { border-color: #d04545; }
+.trash:focus-visible { outline: 2px solid #d04545; outline-offset: 2px; }
+
+body.editing .trash {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Dummy image hover tooltip */
+.unit-tip-wrap {
+  position: relative;
+  display: inline-flex;
+  pointer-events: auto;
+}
+
+.unit-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 6px 10px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 200ms ease, visibility 200ms ease;
+  z-index: 2;
+}
+
+.unit-tip-wrap:hover .unit-tip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Grid (bottom 40%) */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 1px;
+  background: var(--rule);
+}
+
+.tile {
+  appearance: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  position: relative;
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+  height: 120px;
+}
+
+.tile-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.tile-body img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+/* 夢見月瑞希だけ元画像が白背景の四角なので、枠いっぱいに広げて円形にする */
+.tile[data-id="夢見月瑞希"] .tile-body img {
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* counter の .lap-count（小さい数字は bold）に合わせる */
+.tile-count {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Help ("?" top-left) */
+.help-wrap {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+}
+
+.help {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.help-pop {
+  position: absolute;
+  top: 36px;
+  left: 0;
+  min-width: 220px;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 14px 16px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.help-wrap:hover .help-pop,
+.help-wrap.open .help-pop,
+.lock-wrap:hover .help-pop {
+  visibility: visible;
+  opacity: 1;
+}
+
+.help-pop-title {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+
+.lock-pop-title {
+  margin: 0 0 8px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.lock-pop-text {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  color: var(--ink-faint);
+}
+
+.help-pop dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.help-pop dt {
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.help-pop dt svg {
+  display: block;
+  margin-top: 2px;
+}
+
+.help-pop dd {
+  margin: 0;
+  color: var(--ink-faint);
+}
+
+/* Reset confirmation dialog */
+.reset-dialog {
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 24px 28px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.reset-dialog::backdrop { background: rgba(0, 0, 0, 0.2); }
+
+.reset-dialog p {
+  margin: 0 0 6px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.reset-dialog .reset-dialog-note {
+  margin: 0 0 20px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+
+.reset-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.reset-dialog-actions button {
+  appearance: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: opacity 200ms ease;
+}
+
+.reset-dialog-actions button:hover { opacity: 0.8; }
+
+#reset-cancel {
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink-soft);
+}
+
+#reset-confirm {
+  border: 1px solid #d04545;
+  background: #d04545;
+  color: #ffffff;
+}
+
+@media (max-width: 1000px) {
+  /* 9タイルを2行（5+4）で表示する */
+  .grid { grid-template-columns: repeat(5, 1fr); }
+
+  /* 10個目の空セルに罫線背景が透けないよう白で埋める */
+  .grid::after {
+    content: "";
+    background: var(--bg);
+  }
+}
+
+@media (max-width: 720px) {
+  .pickup-icon { width: 160px; height: 160px; }
+  .pickup-count { font-size: 96px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  /* 鍵の点滅は編集モードの状態表示なので、ゆっくりしたフェードに限り維持する */
+  body.editing .lock {
+    animation-duration: 1.6s !important;
+    animation-iteration-count: infinite !important;
+  }
+}

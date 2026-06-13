@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Gacha Counter</title>
+  <meta name="description" content="Gacha pull counter">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="help-wrap" id="help-wrap">
+    <button type="button" class="icon-btn help" id="help" aria-expanded="false" aria-label="使い方">?</button>
+    <div class="help-pop" role="tooltip">
+      <p class="help-pop-title">限定星5ガチャカウンター</p>
+      <dl>
+        <dt>click</dt><dd>+1</dd>
+        <dt>&#8984; + click</dt><dd>&minus;1</dd>
+        <dt>&larr; / &rarr;</dt><dd>カウントの増減</dd>
+        <dt>
+          <svg viewBox="0 0 16 16" width="12" height="12" aria-label="鍵">
+            <path d="M5 7 V5 a3 3 0 0 1 6 0 v2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="3.5" y="7" width="9" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </dt><dd>画像切替モードの入/切</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="lock-wrap" id="lock-wrap">
+    <button type="button" class="icon-btn lock" id="lock" aria-pressed="false" aria-label="ダミー画像の切替モード">
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <path class="shackle" d="M5 7 V5 a3 3 0 0 1 6 0 v2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path class="shackle-open" d="M5 7 V5 a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="3.5" y="7" width="9" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+    </button>
+    <div class="help-pop" role="tooltip">
+      <p class="lock-pop-title">表示設定</p>
+      <p class="lock-pop-text">スライムのアイコンの変更とカウントのリセットができます</p>
+    </div>
+  </div>
+  <button type="button" class="icon-btn trash" id="trash" aria-label="全カウントをリセット">
+    <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+      <path d="M3 4.5 h10 M6.5 4.5 V3 a1 1 0 0 1 1 -1 h1 a1 1 0 0 1 1 1 v1.5 M4.5 4.5 l.7 8 a1.2 1.2 0 0 0 1.2 1.1 h3.2 a1.2 1.2 0 0 0 1.2 -1.1 l.7 -8" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <dialog class="reset-dialog" id="reset-dialog">
+    <p>カウントを全てリセットする？</p>
+    <p class="reset-dialog-note">2週間すると自動で消えます</p>
+    <div class="reset-dialog-actions">
+      <button type="button" id="reset-cancel">キャンセル</button>
+      <button type="button" id="reset-confirm">リセット</button>
+    </div>
+  </dialog>
+
+  <div class="app">
+    <section class="pickup unit skinnable" data-id="PICKUP" role="button" aria-label="PICKUP のカウント">
+      <div class="pickup-body">
+        <span class="unit-tip-wrap">
+          <img class="pickup-icon" src="icons/slime-water.webp" alt="PICKUP">
+          <span class="unit-tip" role="tooltip">狙っている限定星5キャラ</span>
+        </span>
+        <span class="count pickup-count" data-count aria-live="polite" aria-atomic="true"><span data-count-num>0</span></span>
+      </div>
+      <nav class="ref-links" id="ref-links" aria-label="参考リンク">
+        <a href="https://www.hoyolab.com/article/33945807" target="_blank" rel="noopener noreferrer">アイコン集 Vol.1 &nearr;</a>
+        <a href="https://www.hoyolab.com/article/33945837" target="_blank" rel="noopener noreferrer">Vol.2 &nearr;</a>
+      </nav>
+    </section>
+    <section class="grid" id="grid"></section>
+  </div>
+
+  <script src="gacha.js"></script>
+</body>
+</html>
