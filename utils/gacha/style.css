@@ -302,8 +302,9 @@ body.editing .trash {
   object-fit: contain;
 }
 
-/* 夢見月瑞希のアイコンだけ元画像が四角いので角丸にする */
+/* 夢見月瑞希だけ元画像が四角いので、枠いっぱいに広げて角丸にする */
 .tile[data-id="夢見月瑞希"] .tile-body img {
+  object-fit: cover;
   border-radius: 12px;
 }
 
