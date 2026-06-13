@@ -80,6 +80,28 @@ body {
   object-fit: contain;
 }
 
+/* Reference links (PICKUP エリア左下) */
+.ref-links {
+  position: absolute;
+  left: 12px;
+  bottom: 8px;
+  z-index: 2;
+  display: flex;
+  gap: 14px;
+}
+
+.ref-links a {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--ink-faint);
+  text-decoration: none;
+  padding: 6px 0;
+  transition: color 200ms ease;
+}
+
+.ref-links a:hover { color: var(--ink-soft); }
+
 /* Count number (shared) */
 .count {
   font-family: var(--font-display);
@@ -280,11 +302,9 @@ body.editing .trash {
   object-fit: contain;
 }
 
-/* キャラ画像は 白3px + RGB(199,179,142) 3px の二重ボーダーで丸く囲む */
-.tile:not(.skinnable) .tile-body img {
-  border: 3px solid #ffffff;
-  box-shadow: 0 0 0 3px rgb(199, 179, 142);
-  border-radius: 50%;
+/* 夢見月瑞希のアイコンだけ元画像が四角いので角丸にする */
+.tile[data-id="夢見月瑞希"] .tile-body img {
+  border-radius: 12px;
 }
 
 /* counter の .lap-count（小さい数字は bold）に合わせる */

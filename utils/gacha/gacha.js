@@ -11,6 +11,7 @@
 
   const SKIN_KEY = "gacha-skins";
   const SLIME_VARIANTS = ["electric", "fire", "water", "ice", "rock", "wind", "grass"];
+  const DEFAULT_SKIN = "water";
   const SKINNABLE = new Set([PICKUP_ID, DUMMY_ID]);
 
   function loadSkins() {
@@ -35,7 +36,7 @@
   const skins = loadSkins();
 
   function skinOf(id) {
-    return SLIME_VARIANTS.includes(skins[id]) ? skins[id] : SLIME_VARIANTS[0];
+    return SLIME_VARIANTS.includes(skins[id]) ? skins[id] : DEFAULT_SKIN;
   }
 
   function iconOf(id) {
@@ -260,6 +261,9 @@
       closeHelp();
     }
   });
+
+  // リンクは PICKUP 内にあるためカウント加算を発火させない
+  document.getElementById("ref-links").addEventListener("click", (e) => e.stopPropagation());
 
   document.getElementById("trash").addEventListener("click", () => resetDialog.showModal());
   document.getElementById("reset-cancel").addEventListener("click", () => resetDialog.close());
