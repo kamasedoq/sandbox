@@ -14,26 +14,40 @@
   const DEFAULT_SKIN = "water";
   const SKINNABLE = new Set([PICKUP_ID, DUMMY_ID]);
 
-  function loadSkins() {
+  // localStorage はオブジェクト単位で扱う。読み取り失敗・非オブジェクトは null、
+  // 書き込み失敗（容量超過等）は黙って諦めて動作継続する。
+  function readJSON(key) {
     try {
-      const raw = localStorage.getItem(SKIN_KEY);
-      if (!raw) return {};
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
       const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? parsed : {};
+      return parsed && typeof parsed === "object" ? parsed : null;
     } catch {
-      return {};
+      return null;
     }
   }
 
-  function saveSkins() {
+  function writeJSON(key, value) {
     try {
-      localStorage.setItem(SKIN_KEY, JSON.stringify(skins));
+      localStorage.setItem(key, JSON.stringify(value));
     } catch {
       // storage full 等は保存を諦めて動作継続
     }
   }
 
-  const skins = loadSkins();
+  function removeKey(key) {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // removeItem は通常失敗しないが念のため握る
+    }
+  }
+
+  const skins = readJSON(SKIN_KEY) || {};
+
+  function saveSkins() {
+    writeJSON(SKIN_KEY, skins);
+  }
 
   function skinOf(id) {
     return SLIME_VARIANTS.includes(skins[id]) ? skins[id] : DEFAULT_SKIN;
@@ -57,39 +71,25 @@
   const EXPIRY_MS = 14 * 24 * 60 * 60 * 1000;
 
   function loadCounts() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return {};
-      const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== "object") return {};
+    const parsed = readJSON(STORAGE_KEY);
+    if (!parsed) return {};
 
-      // 旧形式（カウントだけの平坦なオブジェクト）は updatedAt なしの新形式として扱う
-      const isNewShape = parsed.counts && typeof parsed.counts === "object";
-      const counts = isNewShape ? parsed.counts : parsed;
+    // 旧形式（カウントだけの平坦なオブジェクト）は updatedAt なしの新形式として扱う
+    const isNewShape = parsed.counts && typeof parsed.counts === "object";
 
-      const updatedAt = Date.parse(parsed.updatedAt);
-      if (!Number.isNaN(updatedAt) && Date.now() - updatedAt > EXPIRY_MS) {
-        localStorage.removeItem(STORAGE_KEY);
-        return {};
-      }
-      return counts;
-    } catch {
+    const updatedAt = Date.parse(parsed.updatedAt);
+    if (!Number.isNaN(updatedAt) && Date.now() - updatedAt > EXPIRY_MS) {
+      removeKey(STORAGE_KEY);
       return {};
     }
+    return isNewShape ? parsed.counts : parsed;
   }
 
   function saveCounts() {
-    try {
-      if (Object.keys(counts).length === 0) {
-        localStorage.removeItem(STORAGE_KEY);
-      } else {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify({ counts, updatedAt: new Date().toISOString() }),
-        );
-      }
-    } catch {
-      // storage full 等は保存を諦めて動作継続
+    if (Object.keys(counts).length === 0) {
+      removeKey(STORAGE_KEY);
+    } else {
+      writeJSON(STORAGE_KEY, { counts, updatedAt: new Date().toISOString() });
     }
   }
 

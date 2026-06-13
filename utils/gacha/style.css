@@ -145,6 +145,25 @@ body {
   100% { transform: translateY(-40px); opacity: 0; }
 }
 
+/* 左上の丸アイコンボタン共通（?, 鍵, ゴミ箱） */
+.icon-btn {
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink-faint);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.icon-btn:hover { color: var(--ink-soft); border-color: var(--ink-faint); }
+.icon-btn:focus { outline: none; }
+.icon-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
 /* Lock (dummy image switch mode) */
 .lock-wrap {
   position: fixed;
@@ -153,23 +172,6 @@ body {
   z-index: 3;
 }
 
-.lock {
-  appearance: none;
-  border: 1px solid var(--rule);
-  background: var(--bg);
-  color: var(--ink-faint);
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition: color 200ms ease, border-color 200ms ease;
-}
-
-.lock:hover { color: var(--ink-soft); border-color: var(--ink-faint); }
-.lock:focus { outline: none; }
-.lock:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .lock .shackle-open { display: none; }
 
 body.editing .lock {
@@ -210,23 +212,14 @@ body.editing .unit:not(.skinnable):active { background: transparent; }
   top: 12px;
   left: 84px;
   z-index: 3;
-  appearance: none;
-  border: 1px solid rgba(208, 69, 69, 0.35);
-  background: var(--bg);
+  border-color: rgba(208, 69, 69, 0.35);
   color: #d04545;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
   visibility: hidden;
   opacity: 0;
   transition: opacity 200ms ease, visibility 200ms ease, border-color 200ms ease;
 }
 
 .trash:hover { border-color: #d04545; }
-.trash:focus { outline: none; }
 .trash:focus-visible { outline: 2px solid #d04545; outline-offset: 2px; }
 
 body.editing .trash {
@@ -324,22 +317,9 @@ body.editing .trash {
 }
 
 .help {
-  appearance: none;
-  border: 1px solid var(--rule);
-  background: var(--bg);
   font-family: var(--font-mono);
   font-size: 13px;
-  color: var(--ink-faint);
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: color 200ms ease, border-color 200ms ease;
 }
-
-.help:hover { color: var(--ink-soft); border-color: var(--ink-faint); }
-.help:focus { outline: none; }
-.help:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 .help-pop {
   position: absolute;
