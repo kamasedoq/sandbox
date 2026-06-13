@@ -177,6 +177,8 @@ body {
 body.editing .lock {
   color: var(--ink);
   border-color: rgb(199, 179, 142);
+  /* 点滅が無効な環境でも「入」が分かるよう静的にゴールド背景を持たせる */
+  background: rgb(199, 179, 142);
   animation: lockPulse 1.6s ease-in-out infinite;
 }
 
@@ -468,5 +470,11 @@ body.editing .trash {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+
+  /* 鍵の点滅は編集モードの状態表示なので、ゆっくりしたフェードに限り維持する */
+  body.editing .lock {
+    animation-duration: 1.6s !important;
+    animation-iteration-count: infinite !important;
   }
 }
