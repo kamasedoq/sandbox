@@ -75,8 +75,8 @@ body {
 }
 
 .pickup-icon {
-  width: 280px;
-  height: 280px;
+  width: 200px;
+  height: 200px;
   object-fit: contain;
 }
 
@@ -302,10 +302,10 @@ body.editing .trash {
   object-fit: contain;
 }
 
-/* 夢見月瑞希だけ元画像が四角いので、枠いっぱいに広げて角丸にする */
+/* 夢見月瑞希だけ元画像が白背景の四角なので、枠いっぱいに広げて円形にする */
 .tile[data-id="夢見月瑞希"] .tile-body img {
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 50%;
 }
 
 /* counter の .lap-count（小さい数字は bold）に合わせる */
