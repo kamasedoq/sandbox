@@ -1,16 +1,8 @@
-# Il Dottore Elapsed Timer
+# sandbox
 
-原神 Ver.6.3 (Luna IV) メンテナンス終了時刻（2026-01-14 11:13 JST）からの経過時間をリアルタイム表示するページ。
+このリポジトリの内容は以下に移転しました。
 
-## Structure
+- 公開ページ: https://zandik.vercel.app/
+- ソース: https://github.com/yukichi-fukuzawa/genshin-dottore-counter
 
-```
-index.html   - ページ本体
-style.css    - スタイル
-main.js      - 経過時間計算・ツールチップ・背景遅延読み込み
-bg.gif       - 背景画像（Il Dottore）
-```
-
-## doc/
-
-- `luna_iv_maintenance_research.md` — メンテナンス終了時刻の調査資料。起点時刻の根拠をまとめたもの。
+旧 URL https://kamasedoq.github.io/sandbox/ には移転案内ページを置いている（`index.html` を GitHub Pages で配信）。
